@@ -19,7 +19,7 @@ const PUBLIC_PATHS = [
   '/status',
   '/api-reliability',
 ];
-const API_PUBLIC_PREFIXES = ['/api/ingest', '/api/webhooks', '/api/auth', '/api/health', '/api/mcp'];
+const API_PUBLIC_PREFIXES = ['/api/ingest', '/api/webhooks', '/api/auth', '/api/health', '/api/mcp', '/api/waitlist'];
 
 // Match auth.ts cookie name so middleware and NextAuth use the same cookie (avoids stale/missing session)
 function getSessionCookieName(): string {

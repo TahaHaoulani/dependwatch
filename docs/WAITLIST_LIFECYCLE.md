@@ -105,7 +105,30 @@ API accepts `metadata` in the request body; service sanitizes and persists.
 
 ---
 
-## 10. Files added or updated
+## 10. Troubleshooting: “Backend not called” / “No row in DB”
+
+**No extra env var is required for the waitlist to be “called”.** The form uses a relative URL: `POST /api/waitlist` on the same origin as the page.
+
+1. **Confirm the request is sent**
+   - Open DevTools → Network. Submit the form. You should see a `POST` to `/api/waitlist`.
+   - If there is **no** request: you may be on a different domain (e.g. preview URL) than the deployed app, or an extension is blocking it. Use the real app URL (e.g. `https://dependwatch.app`).
+   - If the request exists: note the **status code** (200 = success, 500 = server/DB error).
+
+2. **Required for saving to DB**
+   - **`DATABASE_URL`** must be set in the deployment (e.g. Railway) and must point to the **same** PostgreSQL database where you ran the schema.
+   - The **WaitlistEntry** table must exist. On a greenfield DB, run the full schema (e.g. `apps/web/prisma/migrations.sql`) or `npx prisma migrate deploy` so the table is created.
+
+3. **If you see 500 or “Something went wrong”**
+   - Backend is being called; the failure is in the API or DB. Check **Railway logs** for the service at the time of the request (e.g. `[waitlist]` or Prisma/connection errors).
+   - Verify `DATABASE_URL` is correct and the DB has the `WaitlistEntry` table.
+
+4. **Env vars that are not needed for “backend called”**
+   - `INGEST_BASE_URL` is for the **ingest API** (SDK events), not the waitlist. The waitlist form does not use it.
+   - `NEXT_PUBLIC_LANDING_MODE` only controls copy/CTAs; it does not affect whether `/api/waitlist` is invoked.
+
+---
+
+## 11. Files added or updated
 
 | Path | Purpose |
 |------|---------|
@@ -120,7 +143,7 @@ API accepts `metadata` in the request body; service sanitizes and persists.
 
 ---
 
-## 11. Recommended follow-ups
+## 12. Recommended follow-ups
 
 - **Invite waves:** Use `status` (e.g. move to `invited` when you send access) and filter by `createdAt` or segment.
 - **Referral / sharing:** Optional “Share with a teammate” or referral link with `?ref=...` in metadata.
