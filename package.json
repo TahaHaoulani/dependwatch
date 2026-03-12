@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "dotenv -e .env -- npm run dev --workspace=apps/web",
     "build": "dotenv -e .env -- npm run build --workspace=apps/web",
+    "start": "npm run start --workspace=web",
     "clean": "node -e \"require('fs').rmSync('apps/web/.next', { recursive: true, force: true })\"",
     "db:generate": "npm run db:generate --workspace=apps/web",
     "db:migrate": "npm run db:migrate --workspace=apps/web",
