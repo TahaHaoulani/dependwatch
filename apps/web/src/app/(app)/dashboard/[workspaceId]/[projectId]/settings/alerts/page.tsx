@@ -44,7 +44,8 @@ export default async function ProjectAlertsPage({
     monthlyBudgetUsd: r.monthlyBudgetUsd != null ? Number(r.monthlyBudgetUsd) : null,
     cooldownMinutes: r.cooldownMinutes,
   }));
-  const webhookList = (webhooks ?? []).map((w) => ({ id: w.id, url: w.url, enabled: w.enabled }));
+  type RawWebhook = { id: string; url: string; enabled: boolean };
+  const webhookList = (webhooks ?? []).map((w: RawWebhook) => ({ id: w.id, url: w.url, enabled: w.enabled }));
 
   return (
     <>
