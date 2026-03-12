@@ -93,11 +93,9 @@ export function DashboardKpiRow({
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
               Projected monthly cost
-              <HelpCircle
-                className="h-3.5 w-3.5 text-muted-foreground cursor-help shrink-0"
-                title={COST_TOOLTIP}
-                aria-label="How projected cost is calculated"
-              />
+              <span title={COST_TOOLTIP} aria-label="How projected cost is calculated">
+                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help shrink-0" />
+              </span>
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>

@@ -33,8 +33,8 @@ export function DashboardProviderTable({ byProvider }: { byProvider: ProviderRow
       costShare: totalCost > 0 ? row.costUsd / totalCost : 0,
     }));
     rows.sort((a, b) => {
-      let va: number | string = a[sortKey];
-      let vb: number | string = b[sortKey];
+      let va: number | string | null = a[sortKey];
+      let vb: number | string | null = b[sortKey];
       if (sortKey === 'costShare') {
         va = a.costUsd / totalCost;
         vb = b.costUsd / totalCost;
@@ -42,8 +42,8 @@ export function DashboardProviderTable({ byProvider }: { byProvider: ProviderRow
       if (typeof va === 'number' && typeof vb === 'number') {
         return sortDir === 'asc' ? va - vb : vb - va;
       }
-      const sa = String(va);
-      const sb = String(vb);
+      const sa = String(va ?? '');
+      const sb = String(vb ?? '');
       return sortDir === 'asc' ? sa.localeCompare(sb) : sb.localeCompare(sa);
     });
     return rows;

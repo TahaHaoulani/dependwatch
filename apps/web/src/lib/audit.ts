@@ -1,6 +1,7 @@
 /**
  * Audit log for sensitive actions. All writes are fire-and-forget; failures are logged but do not block the operation.
  */
+import { Prisma } from '@prisma/client';
 import { prisma } from './db';
 
 export type AuditAction =
@@ -45,7 +46,7 @@ export async function writeAuditLog(params: {
         action: params.action,
         resource: params.resource,
         resourceId: params.resourceId ?? null,
-        metadata: params.metadata ?? undefined,
+        metadata: (params.metadata ?? undefined) as Prisma.InputJsonValue | undefined,
       },
     });
   } catch (e) {

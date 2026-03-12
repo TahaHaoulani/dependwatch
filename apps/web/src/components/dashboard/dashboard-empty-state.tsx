@@ -310,11 +310,9 @@ export function DashboardEmptyState({
             <span className="tabular-nums text-muted-foreground">{EXAMPLE_PREVIEW_KPI.errorRate} errors</span>
             <span className="tabular-nums font-medium text-foreground ml-auto inline-flex items-center gap-1">
               {formatCurrency(EXAMPLE_PREVIEW_KPI.projectedCost)} projected
-              <HelpCircle
-                className="h-3.5 w-3.5 text-muted-foreground cursor-help shrink-0"
-                title={COST_TOOLTIP}
-                aria-label="How projected cost is calculated"
-              />
+              <span title={COST_TOOLTIP} aria-label="How projected cost is calculated">
+                <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help shrink-0" />
+              </span>
             </span>
             <div className="flex items-end gap-0.5 h-5 w-16 shrink-0" aria-hidden>
               {EXAMPLE_SPARKLINE.map((h, i) => (
@@ -331,11 +329,9 @@ export function DashboardEmptyState({
           <div className="rounded-lg border border-border/60 bg-muted/10 px-4 py-3">
             <p className="text-xs font-medium text-muted-foreground mb-2 inline-flex items-center gap-1">
               Projected API spend this month
-              <HelpCircle
-                className="h-3.5 w-3.5 cursor-help shrink-0"
-                title={COST_TOOLTIP}
-                aria-label="How projected cost is calculated"
-              />
+              <span title={COST_TOOLTIP} aria-label="How projected cost is calculated">
+                <HelpCircle className="h-3.5 w-3.5 cursor-help shrink-0" />
+              </span>
             </p>
             <div className="space-y-2">
               {EXAMPLE_PROJECTED_SPEND.map(({ provider, amount, vsLastMonth }) => {
@@ -451,7 +447,7 @@ export function DashboardEmptyState({
                       variant="ghost"
                       size="sm"
                       className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
-                      onClick={() => setKeyRevealed((r) => !r)}
+                      onClick={() => setKeyRevealed(!keyRevealed)}
                     >
                       {keyRevealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       {keyRevealed ? 'Hide' : 'Reveal'}

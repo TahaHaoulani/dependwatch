@@ -78,7 +78,9 @@ export async function POST(req: Request) {
         where: { projectId, timestamp: { gte: monthStart, lte: monthEnd }, source: { not: 'demo' } },
         _count: true,
       });
-      groups.sort((a, b) => (b._count?.provider ?? 0) - (a._count?.provider ?? 0));
+      const countOf = (g: (typeof groups)[number]) =>
+        typeof g._count === 'number' ? g._count : (g._count as { _all?: number })?._all ?? 0;
+      groups.sort((a, b) => countOf(b) - countOf(a));
       const top = groups.slice(0, limits.maxProviders).map((g) => g.provider.toLowerCase());
       const incomingProviders = [...new Set(eventsToIngest.map((e) => String(e.provider).toLowerCase()))];
       const existingSet = new Set(groups.map((g) => g.provider.toLowerCase()));

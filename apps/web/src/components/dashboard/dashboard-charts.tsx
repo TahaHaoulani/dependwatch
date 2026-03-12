@@ -235,12 +235,12 @@ export function DashboardCharts({
     if (!hasOverlay || selectedProviders.size === 0) return null;
     const selected = Array.from(selectedProviders);
     return trimmedData.map((row) => {
-      const out: Record<string, number> = { time: row.time };
+      const out: Record<string, string | number> = { time: row.time };
       const perTime = byProviderByTime.get(row.time);
       for (const p of selected) {
         out[p] = perTime?.get(p)?.calls ?? 0;
       }
-      return out as Record<string, string | number>;
+      return out;
     });
   }, [hasOverlay, selectedProviders, trimmedData, byProviderByTime]);
 

@@ -1,3 +1,4 @@
+import type { AlertRule } from '@prisma/client';
 import { auth } from '@/lib/auth-server';
 import { getProjectById } from '@/lib/project';
 import { getWorkspaceMemberRole } from '@/lib/workspace';
@@ -25,13 +26,13 @@ export default async function ProjectAlertsPage({
     getCapabilitiesForProject(projectId),
   ]);
   const canEdit = role !== 'viewer' && role != null;
-  const serialized = (rules ?? []).map((r) => ({
+  const serialized = (rules ?? []).map((r: AlertRule) => ({
     id: r.id,
     name: r.name,
     enabled: r.enabled,
     latencyThresholdMs: r.latencyThresholdMs,
-    errorRateThresholdPercent: r.errorRateThresholdPercent?.toNumber?.() ?? r.errorRateThresholdPercent,
-    monthlyBudgetUsd: r.monthlyBudgetUsd?.toNumber?.() ?? r.monthlyBudgetUsd,
+    errorRateThresholdPercent: r.errorRateThresholdPercent != null ? Number(r.errorRateThresholdPercent) : null,
+    monthlyBudgetUsd: r.monthlyBudgetUsd != null ? Number(r.monthlyBudgetUsd) : null,
     cooldownMinutes: r.cooldownMinutes,
   }));
   const webhookList = (webhooks ?? []).map((w) => ({ id: w.id, url: w.url, enabled: w.enabled }));

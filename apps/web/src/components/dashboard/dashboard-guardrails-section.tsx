@@ -17,7 +17,7 @@ function GuardrailShareButtons({
 }: {
   projectId: string;
   alert: GuardrailAlert;
-  toastFn: (p: { title: string; description?: string }) => void;
+  toastFn: (p: { title: string; description?: string; variant?: 'destructive' | 'default' }) => void;
 }) {
   const [loading, setLoading] = useState(false);
   const share = async () => {
@@ -75,7 +75,7 @@ function GuardrailGitHubIssueButton({
   toastFn,
 }: {
   alert: GuardrailAlert;
-  toastFn: (p: { title: string; description?: string }) => void;
+  toastFn: (p: { title: string; description?: string; variant?: 'destructive' | 'default' }) => void;
 }) {
   const copy = async () => {
     const md = guardrailToGitHubMarkdown(alert);
@@ -98,7 +98,7 @@ function GuardrailTrackIncidentButton({
 }: {
   projectId: string;
   alert: GuardrailAlert;
-  toastFn: (p: { title: string; description?: string }) => void;
+  toastFn: (p: { title: string; description?: string; variant?: 'destructive' | 'default' }) => void;
   onCreated?: () => void;
 }) {
   const [loading, setLoading] = useState(false);

@@ -26,13 +26,14 @@ export async function POST(req: Request) {
   const { getStripe } = await import('@/lib/stripe');
   const stripe = getStripe();
 
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
+  }
+
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (e) {
     console.error('[Stripe webhook] signature verification failed', e);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });

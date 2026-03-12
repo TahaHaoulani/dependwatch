@@ -35,6 +35,10 @@ const config: Config = {
           DEFAULT: 'hsl(var(--success))',
           foreground: 'hsl(var(--success-foreground))',
         },
+        danger: {
+          DEFAULT: 'hsl(var(--danger))',
+          foreground: 'hsl(var(--danger-foreground))',
+        },
         info: 'hsl(var(--info))',
         muted: {
           DEFAULT: 'hsl(var(--muted))',
@@ -66,12 +70,6 @@ const config: Config = {
         'text-muted': 'hsl(var(--text-muted))',
         'accent-primary': 'hsl(var(--accent-primary))',
         'accent-primary-hover': 'hsl(var(--accent-primary-hover))',
-        danger: 'hsl(var(--danger))',
-        'danger-foreground': 'hsl(var(--danger-foreground))',
-        success: 'hsl(var(--success))',
-        'success-foreground': 'hsl(var(--success-foreground))',
-        warning: 'hsl(var(--warning))',
-        'warning-foreground': 'hsl(var(--warning-foreground))',
         'card-background': 'hsl(var(--card-background))',
         'table-row-hover': 'hsl(var(--table-row-hover))',
         'code-background': 'hsl(var(--code-background))',
