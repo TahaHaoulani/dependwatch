@@ -42,6 +42,7 @@ Duplicate behavior: one row per email (unique constraint). Resubmitting the same
 - **Content:** Thank you, confirmation of registration, one-sentence product reminder (observability for APIs and AI agent toolchains), note that early users hear first and may get priority onboarding, sign-off from the team. Plain-text fallback included.
 - **Template:** `apps/web/src/lib/waitlist-confirmation-email.ts` — `getWaitlistConfirmationContent()`, `sendWaitlistConfirmationEmail()`.
 - **Delivery:** Uses existing project pattern: SMTP (e.g. SendGrid) if configured, else Resend (`AUTH_RESEND_KEY`). `EMAIL_FROM` for sender. In dev with no provider, logs and returns ok.
+- **Feature flag:** Set `WAITLIST_SEND_CONFIRMATION_EMAIL=false` (or `0`) to disable sending; signups are still saved to the DB and the API returns `emailSent: false`. Omit or set to `true`/`1` to send (default).
 
 ---
 

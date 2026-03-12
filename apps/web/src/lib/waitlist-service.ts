@@ -10,6 +10,13 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_SOURCE_LENGTH = 64;
 const MAX_REFERRAL_LENGTH = 128;
 
+/** When "false" or "0", confirmation email is not sent. Omit or "true"/"1" to send. */
+function isWaitlistConfirmationEmailEnabled(): boolean {
+  const v = process.env.WAITLIST_SEND_CONFIRMATION_EMAIL;
+  if (v === 'false' || v === '0') return false;
+  return true;
+}
+
 export type WaitlistMetadata = {
   utm_source?: string;
   utm_medium?: string;
@@ -94,13 +101,17 @@ export async function registerWaitlist(input: RegisterWaitlistInput): Promise<Re
     },
   });
 
-  const emailResult = await sendWaitlistConfirmationEmail({ to: email });
-  if (!emailResult.ok) {
-    console.error('[waitlist] confirmation_email_failed', emailResult.error?.message);
+  let emailSent = false;
+  if (isWaitlistConfirmationEmailEnabled()) {
+    const emailResult = await sendWaitlistConfirmationEmail({ to: email });
+    if (!emailResult.ok) {
+      console.error('[waitlist] confirmation_email_failed', emailResult.error?.message);
+    }
+    emailSent = emailResult.ok;
   }
   return {
     success: true,
     alreadyRegistered: false,
-    emailSent: emailResult.ok,
+    emailSent,
   };
 }
