@@ -1,0 +1,21 @@
+{
+  "name": "@dependwatch/sdk-node",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  },
+  "peerDependencies": {},
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}

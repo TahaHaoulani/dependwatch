@@ -1,0 +1,520 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   THEME SYSTEM — Semantic tokens (no hardcoded colors in components)
+   Classes: .theme-light | .theme-dark (default when none = dark for no flash)
+   ========================================================================== */
+
+@layer base {
+  /* ---- Dark theme: near-black / charcoal DevTools (Linear, Vercel, Datadog style) ---- */
+  :root,
+  .dark {
+    /* Shadcn-compat (HSL, no hsl() wrapper) — neutral charcoal, no blue wash */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 97%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 97%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 97%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 63% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 0 0% 83%;
+
+    /* Semantic tokens (DependWatch) — charcoal system */
+    --background-primary: 0 0% 4%;
+    --background-secondary: 0 0% 6%;
+    --surface: 0 0% 6%;
+    --surface-elevated: 0 0% 8%;
+    --surface-hover: 0 0% 10%;
+    --border-primary: 0 0% 14%;
+    --border-strong: 0 0% 18%;
+    --border-subtle: 0 0% 10%;
+    --text-primary: 0 0% 97%;
+    --text-secondary: 0 0% 65%;
+    --text-muted: 0 0% 47%;
+    --accent-primary: 238 75% 58%;
+    --accent-primary-hover: 238 75% 65%;
+    --accent-secondary: 0 0% 14%;
+    --danger: 0 72% 51%;
+    --danger-foreground: 0 0% 98%;
+    --success: 152 58% 42%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --info: 217 70% 55%;
+    --card-background: 0 0% 6%;
+    --table-row-hover: 0 0% 10%;
+    --code-background: 0 0% 8%;
+    --code-border: 0 0% 14%;
+    --chart-grid: 0 0% 18%;
+    --chart-label: 0 0% 65%;
+    --chart-1: 238 75% 62%;
+    --chart-2: 152 58% 45%;
+    --chart-3: 38 92% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 0 72% 55%;
+    --chart-tooltip-bg: 0 0% 8%;
+    --chart-tooltip-border: 0 0% 18%;
+    --overlay: 0 0% 0% / 0.85;
+    /* Elevation: subtle, no blue tint */
+    --shadow-card: 0 1px 0 0 hsl(var(--border));
+    --shadow-card-hover: 0 2px 12px hsl(0 0% 0% / 0.25);
+    --shadow-popover: 0 8px 24px hsl(0 0% 0% / 0.4);
+    --radius-card: 0.5rem;
+    --radius-input: 0.375rem;
+    --card-border: 0 0% 14%;
+  }
+
+  /* ---- Light theme (premium: Stripe/Linear quality) ---- */
+  html.theme-light,
+  html[data-theme='light'] {
+    --background: 0 0% 99%;
+    --foreground: 222.2 47% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47% 11.2%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --background-primary: 0 0% 99%;
+    --background-secondary: 210 40% 97%;
+    --surface: 0 0% 100%;
+    --surface-elevated: 0 0% 100%;
+    --surface-hover: 210 40% 96.1%;
+    --border-primary: 214.3 31.8% 91.4%;
+    --border-strong: 214.3 31.8% 88%;
+    --border-subtle: 214.3 31.8% 94%;
+    --text-primary: 222.2 47% 11.2%;
+    --text-secondary: 222.2 30% 25%;
+    --text-muted: 215.4 16.3% 46.9%;
+    --accent-primary: 221 83% 53%;
+    --accent-primary-hover: 221 83% 45%;
+    --accent-secondary: 210 40% 96.1%;
+    --danger: 0 84.2% 60.2%;
+    --danger-foreground: 210 40% 98%;
+    --success: 142 71% 45%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222.2 47.4% 11.2%;
+    --info: 217 70% 50%;
+    --card-background: 0 0% 100%;
+    --table-row-hover: 210 40% 97%;
+    --code-background: 210 20% 97%;
+    --code-border: 214.3 31.8% 88%;
+    --chart-grid: 214.3 31.8% 88%;
+    --chart-label: 215.4 16.3% 46.9%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 142 71% 40%;
+    --chart-3: 38 92% 45%;
+    --chart-4: 280 67% 52%;
+    --chart-5: 0 72% 45%;
+    --chart-tooltip-bg: 0 0% 100%;
+    --chart-tooltip-border: 214.3 31.8% 91.4%;
+    --overlay: 0 0% 0% / 0.5;
+    /* Elevation: soft, layered shadows; slightly rounder corners */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.05);
+    --shadow-popover: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 10px 20px -2px rgba(0, 0, 0, 0.08);
+    --radius-card: 0.75rem;
+    --radius-input: 0.5rem;
+    /* Softer border for cards in light */
+    --card-border: 214.3 31.8% 93%;
+  }
+}
+
+/* Dark: cards use consistent charcoal border (no blue tint) */
+.dark [data-card],
+:root [data-card] {
+  border-color: hsl(var(--border));
+}
+/* Light mode: card elevation and hover feedback */
+.theme-light [data-card] {
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-card);
+  border-color: hsl(var(--card-border));
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.theme-light [data-card]:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+.theme-light [data-card-interactive]:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Light mode: input hover/focus polish */
+.theme-light input.rounded-input {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.theme-light input.rounded-input:hover {
+  border-color: hsl(214.3 31.8% 88%);
+}
+.theme-light input.rounded-input:focus-visible {
+  border-color: hsl(var(--ring) / 0.7);
+}
+
+/* Light mode: header elevation and nav link hover */
+.theme-light header.border-b {
+  border-color: hsl(var(--card-border));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.theme-light header nav a[href]:not(.rounded):hover {
+  color: hsl(var(--foreground));
+}
+
+/* Tailwind uses --background, --foreground, etc. So existing components keep working. */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  /* Light mode: refined typography hierarchy and spacing rhythm */
+  .theme-light {
+    letter-spacing: -0.011em;
+  }
+  .theme-light h1, .theme-light h2, .theme-light h3 {
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+}
+
+/* Spacing rhythm: 4px base (Tailwind default); section spacing */
+@layer utilities {
+  .section-spacing {
+    gap: 1.5rem;
+  }
+  .section-spacing-lg {
+    gap: 2rem;
+  }
+}
+
+/* Landing: premium type scale and motion */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .animate-in-view {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .animate-in-view.visible {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-dashboard-in {
+  animation: dashboardFadeIn 0.5s ease-out forwards;
+}
+
+/* API ecosystem bar: infinite marquee, pause on hover, respect reduced motion */
+@keyframes api-ecosystem-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-api-marquee {
+  animation: api-ecosystem-marquee 45s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-api-marquee {
+    animation-duration: 80s;
+  }
+}
+
+/* Code blocks: theme-aware selection (light/dark) */
+.dark .docs-code-block pre::selection,
+.dark .docs-code-block pre *::selection {
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+}
+.theme-light .docs-code-block pre::selection,
+.theme-light .docs-code-block pre *::selection {
+  background: rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+.docs-code-block pre {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Chart theming: high contrast on charcoal; tooltip uses elevated surface */
+.chart-container .recharts-cartesian-grid line {
+  stroke: hsl(var(--chart-grid));
+}
+.chart-container .recharts-text,
+.chart-container .recharts-tooltip-wrapper {
+  fill: hsl(var(--chart-label));
+}
+.chart-container .recharts-default-tooltip {
+  background-color: hsl(var(--chart-tooltip-bg)) !important;
+  border: 1px solid hsl(var(--chart-tooltip-border)) !important;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  box-shadow: var(--shadow-popover);
+}
+
+/* ==========================================================================
+   Static / legal / support pages — premium DevTools typography & layout
+   ========================================================================== */
+
+.static-page {
+  --static-content-width: 42rem; /* 672px: optimal read length */
+  --static-section-gap: 2.75rem;
+  --static-heading-gap: 0.25rem;
+}
+
+/* Article container: consistent max-width and spacing */
+.static-page .static-article {
+  max-width: var(--static-content-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Page header */
+.static-page .static-article .static-header {
+  padding-bottom: 2rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.5);
+}
+@media (min-width: 768px) {
+  .static-page .static-article .static-header {
+    padding-bottom: 2.5rem;
+  }
+}
+
+.static-page .static-article .static-header .static-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.static-page .static-article .static-header h1 {
+  margin-top: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: hsl(var(--foreground));
+}
+@media (min-width: 640px) {
+  .static-page .static-article .static-header h1 {
+    font-size: 2rem;
+  }
+}
+@media (min-width: 768px) {
+  .static-page .static-article .static-header h1 {
+    font-size: 2.25rem;
+  }
+}
+
+.static-page .static-article .static-header .static-lead {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: hsl(var(--muted-foreground));
+}
+@media (min-width: 768px) {
+  .static-page .static-article .static-header .static-lead {
+    font-size: 1rem;
+  }
+}
+
+/* On-page nav */
+.static-page .static-article .static-nav {
+  margin-top: 1.5rem;
+}
+.static-page .static-article .static-nav .static-nav-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+.static-page .static-article .static-nav ul {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  list-style: none;
+  padding: 0;
+}
+.static-page .static-article .static-nav a {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+.static-page .static-article .static-nav a:hover {
+  color: hsl(var(--foreground));
+}
+.static-page .static-article .static-nav a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Section: divider + spacing rhythm */
+.static-page .static-article .static-section {
+  padding-top: var(--static-section-gap);
+  border-top: 1px solid hsl(var(--border) / 0.35);
+}
+.static-page .static-article .static-section:first-of-type {
+  border-top: none;
+  padding-top: 2rem;
+}
+
+.static-page .static-article .static-section h2 {
+  margin-top: 0;
+  margin-bottom: var(--static-heading-gap);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  color: hsl(var(--foreground));
+  scroll-margin-top: 6rem;
+}
+@media (min-width: 768px) {
+  .static-page .static-article .static-section h2 {
+    font-size: 1.25rem;
+  }
+}
+
+.static-page .static-article .static-section h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.static-page .static-article .static-section p,
+.static-page .static-article .static-section li {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: hsl(var(--muted-foreground));
+}
+.static-page .static-article .static-section p {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+.static-page .static-article .static-section p + p {
+  margin-top: 0.625rem;
+}
+
+.static-page .static-article .static-section ul,
+.static-page .static-article .static-section ol {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  padding-left: 1.5rem;
+}
+.static-page .static-article .static-section li {
+  margin-top: 0.375rem;
+}
+.static-page .static-article .static-section li:first-child {
+  margin-top: 0;
+}
+.static-page .static-article .static-section strong {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+/* Section content that is a div after h2 */
+.static-page .static-article .static-section > h2 + div {
+  margin-top: 0.75rem;
+}
+
+/* Body wrapper for content that isn't a section (e.g. Status page) */
+.static-page .static-article .static-body {
+  margin-top: 2rem;
+}
+
+/* Inline links: premium, dark-mode friendly */
+.static-page .static-article a:not(.static-nav a):not([class*="Button"]):not([class*="button"]) {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease, text-underline-offset 0.15s ease;
+}
+.static-page .static-article a:hover:not(.static-nav a) {
+  text-underline-offset: 3px;
+}
+.dark .static-page .static-article a:focus-visible:not(.static-nav a),
+.theme-light .static-page .static-article a:focus-visible:not(.static-nav a) {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Code in content */
+.static-page .static-article code {
+  font-size: 0.8125rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background: hsl(var(--muted) / 0.8);
+  border: 1px solid hsl(var(--border) / 0.5);
+  color: hsl(var(--foreground));
+}
+
+/* Article footer (back link) */
+.static-page .static-article .static-article-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid hsl(var(--border) / 0.5);
+  font-size: 0.8125rem;
+  color: hsl(var(--muted-foreground));
+}
+.static-page .static-article .static-article-footer a {
+  font-weight: 500;
+}

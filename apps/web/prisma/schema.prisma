@@ -1,0 +1,468 @@
+// DependWatch - Prisma Schema
+// PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ Auth (Auth.js / NextAuth) ============
+model User {
+  id                   String    @id @default(cuid())
+  name                 String?
+  email                String?   @unique
+  emailVerified        DateTime?
+  image                String?
+  sessionVersion       Int       @default(0)
+  mfaEnabled             Boolean   @default(false)
+  totpSecretEncrypted    String?   @db.Text
+  pendingTotpSecretEncrypted String? @db.Text
+  backupCodesHashed      String?   @db.Text
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  memberships WorkspaceMember[]
+  mcpTokens   McpAccessToken[]
+  preference  UserPreference?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============ Workspace & Projects ============
+model Workspace {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  description      String?
+  slackWebhookUrl  String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  members    WorkspaceMember[]
+  projects   Project[]
+  subscription Subscription?
+  overageRecords BillingOverageRecord[]
+  invites    WorkspaceInvite[]
+}
+
+model WorkspaceInvite {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  email          String
+  role           String    @default("developer") // admin, developer, viewer
+  invitedByUserId String
+  tokenHash      String
+  tokenPrefix    String    // first 12 chars for display
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@index([workspaceId])
+  @@index([workspaceId, email])
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  role        String   @default("member") // owner, admin, developer, viewer
+  userId      String
+  workspaceId String
+  createdAt   DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model Project {
+  id                   String   @id @default(cuid())
+  name                 String
+  slug                 String
+  description          String?
+  environment          String?
+  retentionDaysOverride Int?
+  workspaceId          String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  archivedAt           DateTime?
+
+  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  apiKeys   ProjectApiKey[]
+  events    ApiCallEvent[]
+  alertRules AlertRule[]
+  providerConfigs ProjectProviderConfig[]
+  incidentReports IncidentReport[]
+  apiPolicies ApiPolicy[]
+  incidents ApiIncident[]
+  scheduleConfig ProjectScheduleConfig?
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId])
+  @@index([archivedAt])
+}
+
+model ProjectScheduleConfig {
+  id                      String    @id @default(cuid())
+  projectId               String    @unique
+  digestEnabled           Boolean   @default(false)
+  digestFrequency         String?   // daily, weekly
+  digestTimeOfDay         String?   // HH:mm (24h)
+  digestTimezone          String?   @default("UTC")
+  digestDayOfWeek         Int?      // 0-6 (Sun-Sat) for weekly
+  lastDigestAt            DateTime?
+  alertEvaluationFrequencyMinutes Int? // 1, 5, 15; null = not scheduled
+  lastAlertEvaluationAt   DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model SchedulerLock {
+  id         String   @id @default(cuid())
+  lockKey    String   @unique
+  acquiredAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([lockKey])
+  @@index([expiresAt])
+}
+
+model ProjectApiKey {
+  id             String    @id @default(cuid())
+  name           String    @default("Default")
+  keyPrefix      String    // first 12 chars for display, e.g. "dw_live_…"
+  keyHash        String    // hashed full key for verification
+  projectId      String
+  lastUsedAt     DateTime?
+  rotatedAt      DateTime? // set when key was rotated from a previous key
+  createdAt      DateTime  @default(now())
+  environmentTag String?   // optional: production, staging, development
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([keyPrefix])
+}
+
+// ============ Provider catalog & cost ============
+model ProviderCatalog {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  displayName String
+  category    String?  // ai, payments, email, etc.
+  costModel   String?  // fixed_per_call, per_1k_units, custom
+  defaultCostPerCallUsd Decimal? @db.Decimal(12, 6)
+  defaultCostPer1kUsd   Decimal? @db.Decimal(12, 6)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+}
+
+model ProjectProviderConfig {
+  id              String   @id @default(cuid())
+  projectId       String
+  providerSlug    String
+  costPerCallUsd  Decimal? @db.Decimal(12, 6)
+  costPer1kUsd    Decimal? @db.Decimal(12, 6)
+  customLabel     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, providerSlug])
+  @@index([projectId])
+}
+
+// ============ Events ============
+// source: 'sdk' = from ingest API / app; 'demo' = from "Send test events" (do not count toward usage/cost)
+model ApiCallEvent {
+  id              String   @id @default(cuid())
+  projectId       String
+  timestamp       DateTime
+  provider        String
+  serviceName     String?
+  endpoint        String?
+  method          String?
+  environment     String?
+  durationMs      Int?
+  statusCode      Int?
+  success         Boolean
+  errorType       String?
+  errorMessage    String?  @db.VarChar(512)
+  requestCount    Int      @default(1)
+  estimatedCostUsd Decimal? @db.Decimal(12, 6)
+  metadata        Json?
+  region          String?
+  source          String   @default("sdk") @db.VarChar(32) // 'sdk' | 'demo'
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, timestamp])
+  @@index([projectId, provider, timestamp])
+  @@index([projectId, success, timestamp])
+  @@index([projectId, environment, timestamp])
+  @@index([projectId, source])
+}
+
+// ============ Billing ============
+model Subscription {
+  id                   String   @id @default(cuid())
+  workspaceId          String   @unique
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId        String?
+  status               String   // active, canceled, past_due, trialing, free
+  planId               String   // free, builder, startup
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+/// One record per workspace per billing period. Ensures we create at most one overage invoice item per period.
+model BillingOverageRecord {
+  id                   String    @id @default(cuid())
+  workspaceId          String
+  periodStart          DateTime
+  periodEnd            DateTime
+  overageEvents        Int       @default(0)
+  amountCents          Int       @default(0)
+  stripeInvoiceItemId String?   @unique
+  createdAt            DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, periodStart])
+  @@index([workspaceId])
+  @@index([periodStart])
+}
+
+// ============ Alerts ============
+model AlertRule {
+  id                String   @id @default(cuid())
+  projectId         String
+  name              String
+  enabled           Boolean  @default(true)
+  latencyThresholdMs Int?
+  errorRateThresholdPercent Decimal? @db.Decimal(5, 2)
+  monthlyBudgetUsd  Decimal? @db.Decimal(12, 2)
+  cooldownMinutes   Int      @default(60)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model AlertEvent {
+  id         String   @id @default(cuid())
+  projectId  String
+  ruleId     String
+  type       String   // latency, error_rate, budget
+  severity   String   // warning, critical
+  message    String   @db.Text
+  payload    Json?
+  channel    String   // email, slack
+  sentAt     DateTime @default(now())
+
+  @@index([projectId, sentAt])
+  @@index([ruleId, sentAt])
+}
+
+model SlackWebhookConfig {
+  id        String   @id @default(cuid())
+  projectId String
+  url       String   @db.Text
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+// ============ Incident workflow (ack, resolve, assign) ============
+model ApiIncident {
+  id           String    @id @default(cuid())
+  projectId    String
+  provider     String
+  endpoint     String?
+  type         String    // latency_spike, error_spike, cost_spike, traffic_anomaly
+  message      String    @db.Text
+  status       String    @default("open") // open, acknowledged, resolved
+  assignedToId String?
+  note         String?   @db.Text
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([projectId, status])
+}
+
+// ============ Shareable incident reports (public growth) ============
+model IncidentReport {
+  id             String   @id @default(cuid())
+  publicId       String   @unique // URL-safe id for /incidents/[publicId]
+  projectId      String
+  provider       String
+  endpoint       String?
+  detectionType  String   // latency_spike, error_spike, cost_anomaly, traffic_anomaly
+  message        String   @db.Text
+  metrics        Json?    // e.g. { errorRateBefore, errorRateAfter, p95Ms, increase }
+  timeline       Json?    // optional events for timeline
+  createdAt      DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([publicId])
+}
+
+// ============ Control / protection layer (foundation) ============
+// Retry, fallback, guardrail policy config. Runtime enforcement is roadmap; config is stored here.
+model ApiPolicy {
+  id        String   @id @default(cuid())
+  projectId String
+  type      String   // retry, fallback, guardrail
+  name      String
+  enabled   Boolean  @default(true)
+  config    Json?    // type-specific: maxRetries, backoffMs, fallbackProvider, etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([projectId, type])
+}
+
+// ============ MCP access (scoped tokens for Cursor / Claude Code) ============
+model McpAccessToken {
+  id           String    @id @default(cuid())
+  label        String    // user-facing name, e.g. "Cursor (local)"
+  tokenHash    String    // SHA-256 hash of raw token
+  tokenPrefix  String    // first 12 chars for display, e.g. "dw_mcp_abc…"
+  userId       String
+  workspaceId  String?   // null = all workspaces for user
+  scopes       String    // comma-separated: docs:read,projects:read,projects:test-event,metrics:read
+  lastUsedAt   DateTime?
+  revokedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([workspaceId])
+}
+
+// ============ User preferences (account settings) ============
+model UserPreference {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  theme               String   @default("system") // dark, light, system
+  timezone            String   @default("UTC")
+  dateFormat          String?
+  defaultLandingPage  String?
+  emailNotifications Boolean  @default(true)
+  billingNotifications Boolean @default(true)
+  alertDigest         String   @default("instant") // instant, daily, weekly
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============ Waitlist (early access) ============
+model WaitlistEntry {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  source         String    @default("landing") // hero, pricing, footer, etc.
+  status         String    @default("pending") // pending | confirmed | invited
+  name           String?
+  company        String?
+  useCase        String?   // optional use case / role
+  referralSource String?   // e.g. hn, reddit, twitter
+  metadata       Json?     // utm_*, referrer, campaign — for traction analysis
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([createdAt])
+  @@index([source])
+  @@index([status])
+}
+
+// ============ Optional audit / email log ============
+model AuditLog {
+  id          String   @id @default(cuid())
+  workspaceId String?
+  projectId   String?
+  userId      String?
+  action      String
+  resource    String
+  resourceId  String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([workspaceId, createdAt])
+  @@index([projectId, createdAt])
+  @@index([userId, createdAt])
+}

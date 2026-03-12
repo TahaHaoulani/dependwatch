@@ -1,0 +1,25 @@
+{
+  "name": "dependwatch",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "dotenv -e .env -- npm run dev --workspace=apps/web",
+    "build": "dotenv -e .env -- npm run build --workspace=apps/web",
+    "clean": "node -e \"require('fs').rmSync('apps/web/.next', { recursive: true, force: true })\"",
+    "db:generate": "npm run db:generate --workspace=apps/web",
+    "db:migrate": "npm run db:migrate --workspace=apps/web",
+    "db:seed": "npm run db:seed --workspace=apps/web",
+    "db:push": "npm run db:push --workspace=apps/web",
+    "db:studio": "npm run db:studio --workspace=apps/web"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "dependwatch",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "dependwatch": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
