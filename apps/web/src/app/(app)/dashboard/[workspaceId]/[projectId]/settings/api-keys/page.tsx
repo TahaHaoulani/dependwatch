@@ -18,14 +18,23 @@ export default async function ProjectApiKeysPage({
   if (!project) return null;
   const canEdit = role !== 'viewer' && role != null;
 
-  const apiKeys = project.apiKeys.map((k) => ({
+  type RawKey = {
+    id: string;
+    name: string;
+    keyPrefix: string;
+    lastUsedAt: Date | null;
+    rotatedAt?: Date | null;
+    createdAt: Date;
+    environmentTag?: string | null;
+  };
+  const apiKeys = project.apiKeys.map((k: RawKey) => ({
     id: k.id,
     name: k.name,
     keyPrefix: k.keyPrefix,
     lastUsedAt: k.lastUsedAt,
-    rotatedAt: (k as { rotatedAt?: Date | null }).rotatedAt ?? null,
+    rotatedAt: k.rotatedAt ?? null,
     createdAt: k.createdAt,
-    environmentTag: (k as { environmentTag?: string | null }).environmentTag ?? null,
+    environmentTag: k.environmentTag ?? null,
   }));
 
   return (
