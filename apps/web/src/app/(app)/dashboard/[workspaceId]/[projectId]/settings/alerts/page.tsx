@@ -1,4 +1,3 @@
-import type { AlertRule } from '@prisma/client';
 import { auth } from '@/lib/auth-server';
 import { getProjectById } from '@/lib/project';
 import { getWorkspaceMemberRole } from '@/lib/workspace';
@@ -19,14 +18,24 @@ export default async function ProjectAlertsPage({
   const project = await getProjectById(projectId, session.user.id);
   if (!project) return null;
 
-  const [rules, webhooks, role, capabilities] = await Promise.all([
+  const [rulesRes, webhooks, role, capabilities] = await Promise.all([
     import('@/lib/alert-rule').then((m) => m.listAlertRules(projectId, session.user.id)),
     import('@/lib/slack-webhook').then((m) => m.listSlackWebhooks(projectId, session.user.id)),
     getWorkspaceMemberRole(workspaceId, session.user.id),
     getCapabilitiesForProject(projectId),
   ]);
+  type RawRule = {
+    id: string;
+    name: string;
+    enabled: boolean;
+    latencyThresholdMs: number | null;
+    errorRateThresholdPercent: unknown;
+    monthlyBudgetUsd: unknown;
+    cooldownMinutes: number;
+  };
+  const rules = rulesRes as RawRule[] | null;
   const canEdit = role !== 'viewer' && role != null;
-  const serialized = (rules ?? []).map((r: AlertRule) => ({
+  const serialized = (rules ?? []).map((r): { id: string; name: string; enabled: boolean; latencyThresholdMs: number | null; errorRateThresholdPercent: number | null; monthlyBudgetUsd: number | null; cooldownMinutes: number } => ({
     id: r.id,
     name: r.name,
     enabled: r.enabled,
